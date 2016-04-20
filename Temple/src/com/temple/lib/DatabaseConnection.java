@@ -17,7 +17,7 @@ public class DatabaseConnection {
 		try {
 			// Setup the connection with the DB
 			
-			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "username", "password"); //change username and passowrd 
+			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "admin"); //change username and passowrd 
 
 			// Statements allow to issue SQL queries to the database
 			statement = connect.createStatement();
@@ -33,26 +33,26 @@ public class DatabaseConnection {
 
 		try {
 			if (i == 1) {
-				resultSet = statement.executeQuery("Select * from patron where PHONE_NUMBER is = '" + userInput + "'");
+				resultSet = statement.executeQuery("Select * from patron where PhoneNumber is = '" + userInput + "'");
 				String firstName, lastName, number;
 
 				while (resultSet.next()) {
-					firstName = resultSet.getString("FIRST_NAME");
-					lastName = resultSet.getString("LAST_NAME");
-					number = resultSet.getString("PHONE_NUMBER");
+					firstName = resultSet.getString("FirstName");
+					lastName = resultSet.getString("LastName");
+					number = resultSet.getString("PhoneNumber");
 
 					Patron patron = new Patron(firstName, lastName, number);
 					listOfMatches.add(patron);
 				}
 
 			} else {
-				resultSet = statement.executeQuery("Select * from patron where LAST_NAME is = ' " + userInput + "'");
+				resultSet = statement.executeQuery("Select * from patron where LastName is = ' " + userInput + "'");
 				String firstName, lastName, number;
 
 				while (resultSet.next()) {
-					firstName = resultSet.getString("FIRST_NAME");
-					lastName = resultSet.getString("LAST_NAME");
-					number = resultSet.getString("PHONE_NUMBER");
+					firstName = resultSet.getString("FirstName");
+					lastName = resultSet.getString("LastName");
+					number = resultSet.getString("PhoneNumber");
 
 					Patron patron = new Patron(firstName, lastName, number);
 					listOfMatches.add(patron);
@@ -68,4 +68,17 @@ public class DatabaseConnection {
 		return null;
 	}
 
+	
+	public static boolean insertInfo(String firstName, String lastName, String phoneNumber, boolean isMember){
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 }
