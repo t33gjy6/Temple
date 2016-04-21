@@ -1,4 +1,4 @@
-package com.db;
+package com.temple.lib;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import com.util.Patron;
+import com.temple.lib.Patron;
 
 public class DatabaseConnection {
 
@@ -17,86 +17,63 @@ public class DatabaseConnection {
 	private static ResultSet resultSet = null;
 	public static PreparedStatement preparedStatement = null;
 
-	public static void main(String[] args) {
-		try {
-			insertInfo("Lennon", "Gates", "9866", 1, preparedDatabase());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public static Statement readDatabase() throws Exception {
-		try {
-			// Setup the connection with the DB
-
-			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?", "root", "admin");
-
-			// Statements allow to issue SQL queries to the database
-			statement = connect.createStatement();
-			System.out.println("Connected.");
-			return statement;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-
 	public static Connection preparedDatabase() throws Exception {
 
 		try {
 			// Setup the connection with the DB
 			Class.forName("com.mysql.jdbc.Driver");
-			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?", "root", "admin"); // change
+			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?", "root", "sesame"); // change
 																											// username
-																											// and
 																											// passowrd
-
-			// Statements allow to issue SQL queries to the database
-
 			return connect;
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 
-	public ArrayList<Patron> checkInfo(Statement statement, String userInput, int i) {
-
-		ArrayList<Patron> listOfMatches = new ArrayList<Patron>();
-
+	public static Statement readDatabase() throws Exception {
 		try {
-			if (i == 1) {
-				resultSet = statement.executeQuery("Select * from patron where PhoneNumber is = '" + userInput + "'");
-				String firstName, lastName, number;
+			connect = preparedDatabase();
+			// Statements allow to issue SQL queries to the database
+			statement = connect.createStatement();
 
-				while (resultSet.next()) {
-					firstName = resultSet.getString("FirstName");
-					lastName = resultSet.getString("LastName");
-					number = resultSet.getString("PhoneNumber");
+			System.out.println("Connected.");
 
-					Patron patron = new Patron(firstName, lastName, number);
-					listOfMatches.add(patron);
-				}
+			return statement;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 
+	public static ArrayList<Patron> checkInfo(String userInput, String query) throws Exception {
+		ArrayList<Patron> listOfMatches = new ArrayList<Patron>();
+		Statement statement = readDatabase();
+		try {
+			String firstName = null, lastName = null, number;
+			if (query != "") {
+				resultSet = statement.executeQuery("Select * from patron where " + query + " = " + "'" + userInput + "';");
 			} else {
-				resultSet = statement.executeQuery("Select * from patron where LAST_NAME is = ' " + userInput + "'");
-				String firstName, lastName, number;
-
-				while (resultSet.next()) {
-					firstName = resultSet.getString("FirstName");
-					lastName = resultSet.getString("LastName");
-					number = resultSet.getString("PhoneNumber");
-
-					Patron patron = new Patron(firstName, lastName, number);
-					listOfMatches.add(patron);
+				if (userInput.contains(" ")) {
+					firstName = userInput.substring(0, userInput.indexOf(" "));
+					lastName = userInput.substring(userInput.indexOf(" "), userInput.length());
+				} else {
+					firstName = userInput;
+					lastName = userInput;
 				}
+				listOfMatches.addAll(checkInfo(firstName, "FirstName"));
+				listOfMatches.addAll(checkInfo(lastName, "LastName"));
 			}
-
+			while (resultSet.next()) {
+				firstName = resultSet.getString("FirstName");
+				lastName = resultSet.getString("LastName");
+				number = resultSet.getString("PhoneNumber");
+				Patron patron = new Patron(firstName, lastName, number);
+				listOfMatches.add(patron);
+			}
 			return listOfMatches;
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return null;
 	}
 
