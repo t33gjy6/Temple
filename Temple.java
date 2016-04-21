@@ -1,7 +1,11 @@
-package com.temple.lib;
+package com.util;
 
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import org.apache.commons.lang3.math.NumberUtils;
+
+import com.db.DatabaseConnection;
 
 public class Temple {
 
@@ -38,4 +42,14 @@ public class Temple {
 			}
 		}
 	}
+
+	public static String formatPhoneNumber(String phoneNumber) {
+		String formattedNumber = phoneNumber.replaceAll("[()-]", "").replaceAll(" ", "");
+		if (formattedNumber.length() == 11) {
+			return formattedNumber.substring(1);
+		} else {
+			return formattedNumber;
+		}
+	}
+
 }

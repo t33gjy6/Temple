@@ -1,27 +1,59 @@
-package com.temple.lib;
+package com.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.util.Patron;
+
 public class DatabaseConnection {
 
-	private Connection connect = null;
+	private static Connection connect = null;
 	public static Statement statement = null;
 	private static ResultSet resultSet = null;
+	public static PreparedStatement preparedStatement = null;
 
-	public Statement readDatabase() throws Exception {
+	public static void main(String[] args) {
+		try {
+			insertInfo("Lennon", "Gates", "9866", 1, preparedDatabase());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static Statement readDatabase() throws Exception {
 		try {
 			// Setup the connection with the DB
-			
-			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "username", "password"); //change username and passowrd 
+
+			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?", "root", "admin");
 
 			// Statements allow to issue SQL queries to the database
 			statement = connect.createStatement();
+			System.out.println("Connected.");
 			return statement;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	public static Connection preparedDatabase() throws Exception {
+
+		try {
+			// Setup the connection with the DB
+			Class.forName("com.mysql.jdbc.Driver");
+			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?", "root", "admin"); // change
+																											// username
+																											// and
+																											// passowrd
+
+			// Statements allow to issue SQL queries to the database
+
+			return connect;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -33,13 +65,13 @@ public class DatabaseConnection {
 
 		try {
 			if (i == 1) {
-				resultSet = statement.executeQuery("Select * from patron where PHONE_NUMBER is = '" + userInput + "'");
+				resultSet = statement.executeQuery("Select * from patron where PhoneNumber is = '" + userInput + "'");
 				String firstName, lastName, number;
 
 				while (resultSet.next()) {
-					firstName = resultSet.getString("FIRST_NAME");
-					lastName = resultSet.getString("LAST_NAME");
-					number = resultSet.getString("PHONE_NUMBER");
+					firstName = resultSet.getString("FirstName");
+					lastName = resultSet.getString("LastName");
+					number = resultSet.getString("PhoneNumber");
 
 					Patron patron = new Patron(firstName, lastName, number);
 					listOfMatches.add(patron);
@@ -50,9 +82,9 @@ public class DatabaseConnection {
 				String firstName, lastName, number;
 
 				while (resultSet.next()) {
-					firstName = resultSet.getString("FIRST_NAME");
-					lastName = resultSet.getString("LAST_NAME");
-					number = resultSet.getString("PHONE_NUMBER");
+					firstName = resultSet.getString("FirstName");
+					lastName = resultSet.getString("LastName");
+					number = resultSet.getString("PhoneNumber");
 
 					Patron patron = new Patron(firstName, lastName, number);
 					listOfMatches.add(patron);
@@ -66,6 +98,30 @@ public class DatabaseConnection {
 		}
 
 		return null;
+	}
+
+	public static boolean insertInfo(String firstName, String lastName, String phoneNumber, int isMember,
+			Connection connect) {
+		String preparedQuery = "INSERT INTO patron (FirstName, LastName, PhoneNumber, Member)" + "Values(?, ?, ?, ?)";
+
+		boolean isComplete = false;
+		try {
+
+			preparedStatement = connect.prepareStatement(preparedQuery);
+			preparedStatement.setString(1, firstName);
+			preparedStatement.setString(2, lastName);
+			preparedStatement.setString(3, phoneNumber);
+			preparedStatement.setInt(4, isMember);
+			preparedStatement.executeUpdate();
+			isComplete = true;
+			return isComplete;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+
+		return isComplete;
 	}
 
 }
