@@ -22,7 +22,7 @@ public class DatabaseConnection {
 		try {
 			// Setup the connection with the DB
 			Class.forName("com.mysql.jdbc.Driver");
-			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?", "root", "sesame"); // change
+			connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?", "user", "pass"); // change
 																											// username
 																											// passowrd
 			return connect;
